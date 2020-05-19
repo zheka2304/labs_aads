@@ -56,6 +56,38 @@ private:
     int length = 0;
 
 public:
+    list() = default;
+
+    list(list const& other) {
+        for (auto it = other.begin(); it != other.end(); it++) {
+            add(*it);
+        }
+    }
+
+    list(list&& other) {
+        first = other.first;
+        last = other.last;
+        length = other.length;
+        other.first = other.last = nullptr;
+        other.length = 0;
+    }
+
+    list& operator= (list const& other) {
+        for (auto it = other.begin(); it != other.end(); it++) {
+            add(*it);
+        }
+        return *this;
+    }
+
+    list& operator= (list&& other) {
+        first = other.first;
+        last = other.last;
+        length = other.length;
+        other.first = other.last = nullptr;
+        other.length = 0;
+        return *this;
+    }
+
     iterator begin() {
         return first != nullptr ? iterator(first) : end();
     }
