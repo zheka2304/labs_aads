@@ -342,7 +342,7 @@ public:
 
 private:
     rb_tree tree;
-    list<V> key_list;
+    list<K> key_list;
     list<V> value_list;
 
 public:
