@@ -7,6 +7,7 @@
 
 template <typename K, typename V>
 class rb_map {
+public:
     class rb_tree {
     public:
         enum node_color : int {
@@ -33,6 +34,10 @@ class rb_map {
                 this->key = *key_iter;
                 key_iterator = key_iter;
                 value_iterator = value_iter;
+            }
+
+            V& operator*() {
+                return *value_iterator;
             }
 
             ~rb_node() {
