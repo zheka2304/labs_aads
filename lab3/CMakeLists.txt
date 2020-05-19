@@ -6,6 +6,6 @@ project(lab3)
 
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
-add_executable(lab3 main.cpp pathfinding.cpp)
-add_executable(lab3_tests test.cpp pathfinding.cpp)
+add_executable(lab3 main.cpp pathfinding.cpp graph.cpp)
+add_executable(lab3_tests test.cpp pathfinding.cpp graph.cpp)
 target_link_libraries(lab3_tests gtest gtest_main)
