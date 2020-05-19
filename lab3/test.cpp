@@ -4,17 +4,14 @@
 #include "graph.h"
 #include "pathfinding.h"
 
-
 // graph tests
 TEST (graph, fully_connected_pathfinding) {
     Graph mGraph;
-
     const int size = 25 * 10;
     for (int i = 0; i < size; i++) {
         char name[] = {char('A' + i % 25), char('A' + (i / 25) % 25), '\0'};
         mGraph.get_or_make_vertex(name);
     }
-
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
             mGraph.connect(i, j, 1);

@@ -6,7 +6,7 @@ int main() {
     mGraph.read("../../lab3/data.txt");
 
     while (true) {
-        std::cout << "\n\ngraph: ";
+        std::cout << "\n\ngraph: \n";
         mGraph.print();
         std::cout << "\n\ntype 1 to find shortest path between cities\ntype 2 to show all shortest paths from city\ntype 3 to read file\ntype any other number to exit\ncommand: ";
 

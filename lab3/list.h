@@ -155,4 +155,4 @@ public:
     }
 };
 
-#endif //LAB1_LIST_H
+#endif
