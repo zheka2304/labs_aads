@@ -15,7 +15,11 @@ class array {
         if (allocated_memory_size < size) {
             int old_size = allocated_memory_size;
             while (allocated_memory_size < size) {
-                allocated_memory_size += 16;
+                if (allocated_memory_size < 32) {
+                    allocated_memory_size += 16;
+                } else {
+                    allocated_memory_size *= 2;
+                }
             }
 
             if (allocated_memory != nullptr) {
