@@ -6,6 +6,6 @@ project(coursework)
 
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
-add_executable(coursework main.cpp)
-add_executable(coursework_tests test.cpp)
+add_executable(coursework main.cpp flow_network.cpp)
+add_executable(coursework_tests test.cpp flow_network.cpp)
 target_link_libraries(coursework_tests gtest gtest_main)
