@@ -22,7 +22,6 @@ public:
         bool visited = false;
         Vertex* path_next = nullptr;
         Vertex* path_last = nullptr;
-        int print_position = 0;
 
         NodeData() = default;
         NodeData(std::string const& name) : name(name) {};
@@ -45,8 +44,6 @@ public:
     public:
         int max_flow = 0;
         int flow = 0;
-
-        bool print_flag = false;
 
         EdgeData() = default;
         EdgeData(int max_flow) : max_flow(max_flow) {};
@@ -179,94 +176,7 @@ public:
         }
     }
 
-    void print() {
-        if (mGraph.get_vertices().length() == 0) {
-            std::cout << "network graph is empty\n";
-            return;
-        }
 
-        int string_length = 1;
-        int arrow_length = 13;
-
-        mGraph.for_each([] (Edge& edge) -> void {
-            edge.data.print_flag = false;
-        });
-
-        array<Vertex>& vertices = mGraph.get_vertices();
-        for (int i = 0; i < vertices.length(); i++) {
-            vertices[i].data.print_position = i;
-            if (vertices[i].data.name.length() > string_length) {
-                string_length = (int) vertices[i].data.name.length();
-            }
-        }
-
-        for (int i = 0; i < vertices.length(); i++) {
-            Vertex& vertex = vertices[i];
-            std::cout << vertex.data.name;
-            int len = string_length + arrow_length - (int) vertex.data.name.length();
-            for (int j = 0; j < len; j++) {
-                std::cout << " ";
-            }
-        }
-        std::cout << "\n";
-
-        int counter = 0;
-        bool all_printed = false;
-        while (!all_printed) {
-            int line_length = (string_length + arrow_length) * vertices.length();
-            char* line = new char[line_length + 1];
-            for (int i = 0; i < line_length; i++) {
-                line[i] = i % (string_length + arrow_length) == 0 ? '|' : ' ';
-            }
-            line[line_length] = 0;
-
-            int end_position = -1;
-            while (!all_printed) {
-                Edge *min_edge = nullptr;
-                int cur_min_edge_end = -1;
-                all_printed = true;
-                mGraph.for_each([&](Edge &edge) -> void {
-                    if (!edge.data.print_flag) {
-                        all_printed = false;
-                        int start_pos = std::min(edge.from->data.print_position, edge.connected->data.print_position);
-                        int end_pos = std::max(edge.from->data.print_position, edge.connected->data.print_position);
-                        if (std::min(start_pos, end_pos) >= end_position) {
-                            if (min_edge == nullptr || end_pos < cur_min_edge_end) {
-                                min_edge = &edge;
-                                cur_min_edge_end = end_pos;
-                            }
-                        }
-                    }
-                });
-
-                if (min_edge == nullptr) {
-                    break;
-                }
-                min_edge->data.print_flag = true;
-                end_position = cur_min_edge_end;
-
-                int edge_start = 1 + std::min(min_edge->from->data.print_position, min_edge->connected->data.print_position) * (string_length + arrow_length);
-                int edge_end = std::max(min_edge->from->data.print_position, min_edge->connected->data.print_position) * (string_length + arrow_length);
-                for (int i = edge_start; i < edge_end; i++) {
-                    line[i] = '-';
-                }
-
-                int mid = (edge_end + edge_start) / 2 - 3;
-                sprintf(&line[mid], " %2i/%-2i ", min_edge->data.flow, min_edge->data.max_flow);
-                line[strlen(line)] = '-';
-
-                if (min_edge->from->data.print_position < min_edge->connected->data.print_position) {
-                    line[edge_end - 1] = '>';
-                } else {
-                    line[edge_start] = '<';
-                }
-            }
-
-            std::cout << line << "\n";
-            delete[] line;
-        }
-
-    };
 
     Vertex& get_or_add_vertex(std::string const& name) {
         Vertex* vertex = mGraph.get_vertex(name);
@@ -328,6 +238,23 @@ public:
         }
     }
 
+    void print() {
+        if (mGraph.size() == 0) {
+            std::cout << "flow network is emtpy\n";
+            return;
+        }
+        mGraph.print(13,
+                [] (NodeData& data) -> std::string {
+                    return data.name;
+                },
+                [] (EdgeData& data) -> std::string {
+                    char line[64];
+                    sprintf(line, " %2i/%-2i ", data.flow, data.max_flow);
+                    return line;
+                });
+    }
+
 };
+
 
 #endif
