@@ -64,6 +64,9 @@ public:
     ValidationResult validate(Vertex* vertex = nullptr, Vertex* last = nullptr);
     array<Vertex*> bfs();
     void build_max_flow();
+    int get_flow_at(Vertex& vertex);
+    int get_flow_at_source();
+    int get_flow_at_target();
 
     bool add_edge_from_string(std::string line);
     bool read(std::string filename);

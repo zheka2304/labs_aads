@@ -135,6 +135,27 @@ void FlowNetwork::build_max_flow() {
     }
 }
 
+int FlowNetwork::get_flow_at(Vertex& vertex) {
+    int flow = 0;
+    mGraph.for_each([&] (Edge& edge) -> void {
+        if (edge.connected == &vertex) {
+            flow += edge.data.flow;
+        }
+        if (edge.from == &vertex) {
+            flow -= edge.data.flow;
+        }
+    });
+    return flow;
+}
+
+int FlowNetwork::get_flow_at_source() {
+    return source != nullptr ? -get_flow_at(*source) : 0;
+}
+
+int FlowNetwork::get_flow_at_target() {
+    return target != nullptr ? get_flow_at(*target) : 0;
+}
+
 FlowNetwork::Vertex &FlowNetwork::get_or_add_vertex(std::string const &name) {
     Vertex* vertex = mGraph.get_vertex(name);
     if (vertex == nullptr) {
@@ -158,6 +179,12 @@ bool FlowNetwork::add_edge_from_string(std::string line) {
         mGraph.connect(vertex1, vertex2, EdgeData(std::strtol(tokens[2].data(), nullptr, 10)));
         if (vertex1.data.name == "S") {
             source = &vertex1;
+        }
+        if (vertex1.data.name == "T") {
+            target = &vertex1;
+        }
+        if (vertex2.data.name == "S") {
+            source = &vertex2;
         }
         if (vertex2.data.name == "T") {
             target = &vertex2;
