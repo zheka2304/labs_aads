@@ -86,10 +86,6 @@ public:
         return allocated_memory[index];
     }
 
-    T const& operator[] (int index) const {
-        return allocated_memory[index];
-    }
-
     void resize(int new_size) {
         if (new_size == 0) {
             clear();

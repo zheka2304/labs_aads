@@ -1,5 +1,6 @@
 #include "graph.h"
 #include "flow_network.h"
+#include "canvas.h"
 
 void await_user() {
     std::cout << "press enter to continue...";
@@ -7,6 +8,10 @@ void await_user() {
 }
 
 int main() {
+    Canvas canvas(50, 30);
+    canvas.line(0, 0, 1, 0.5);
+    canvas.print();
+
     FlowNetwork network;
     network.read("../../coursework/data.txt");
 
@@ -84,8 +89,8 @@ int main() {
                 FlowNetwork::Vertex* v1 = network.mGraph.get_vertex(start);
                 FlowNetwork::Vertex* v2 = network.mGraph.get_vertex(end);
                 if (v1 != nullptr && v2 != nullptr) {
-                    FlowNetwork::Edge* edge = network.mGraph.get_edge(*v1, *v2);
-                    if (edge != nullptr) {
+                    FlowNetwork::Edge& edge = network.mGraph.get_edge(*v1, *v2);
+                    if (edge.active) {
                         network.mGraph.disconnect(*v1, *v2);
                     } else {
                         std::cout << "no such edge exists\n";

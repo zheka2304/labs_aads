@@ -45,7 +45,7 @@ void FlowNetwork::reset_vertices() {
 void FlowNetwork::reset_edges() {
     mGraph.for_each([] (Edge& edge) -> void {
         edge.data.reset();
-    });
+    }, true);
 }
 
 FlowNetwork::ValidationResult FlowNetwork::validate(FlowNetwork::Vertex *vertex, FlowNetwork::Vertex *last) {
@@ -61,10 +61,12 @@ FlowNetwork::ValidationResult FlowNetwork::validate(FlowNetwork::Vertex *vertex,
     }
     vertex->data.visited = true;
     bool any = false;
-    for (auto it = vertex->edges.begin(); it != vertex->edges.end(); it++) {
-        if (it->connected != last) {
+
+    for (int i = 0; i < mGraph.size(); i++) {
+        Edge& edge = mGraph.get_edge(vertex->index, i);
+        if (edge.active && edge.connected != last) {
             any = true;
-            ValidationResult result = validate(it->connected, vertex);
+            ValidationResult result = validate(edge.connected, vertex);
             if (result != RESULT_OK) {
                 return result;
             }
@@ -95,13 +97,13 @@ array<FlowNetwork::Vertex *> FlowNetwork::bfs() {
             return path;
         }
 
-        for (auto it = vertex->edges.begin(); it != vertex->edges.end(); it++) {
-            if (!it->connected->data.visited && it->data.remaining_flow() > 0) {
-                it->connected->data.visited = true;
-                it->connected->data.path_last = vertex;
-                queue.enqueue(it->connected);
+        vertex->for_each([&] (Edge& edge) -> void {
+            if (!edge.connected->data.visited && edge.data.remaining_flow() > 0) {
+                edge.connected->data.visited = true;
+                edge.connected->data.path_last = vertex;
+                queue.enqueue(edge.connected);
             }
-        }
+        }, true);
     }
 
     return array<Vertex*>();
@@ -118,7 +120,7 @@ void FlowNetwork::build_max_flow() {
 
         array<Edge*> path_edges;
         for (int i = 0; i < path.length() - 1; i++) {
-            path_edges.add(mGraph.get_edge(*path[i + 1], *path[i]));
+            path_edges.add(&mGraph.get_edge(*path[i + 1], *path[i]));
         }
 
         int min_remaining_flow = path_edges[0]->data.remaining_flow();
@@ -131,6 +133,7 @@ void FlowNetwork::build_max_flow() {
 
         for (int i = 0; i < path_edges.length(); i++) {
             path_edges[i]->data.flow += min_remaining_flow;
+            path_edges[i]->opposite().data.flow -= min_remaining_flow;
         }
     }
 }
@@ -227,13 +230,13 @@ void FlowNetwork::print() {
         std::cout << "flow network is emtpy\n";
         return;
     }
-    mGraph.print(13,
-                 [] (NodeData& data) -> std::string {
-                     return data.name;
+    mGraph.print(9,
+                 [] (Vertex& v) -> std::string {
+                     return v.data.name;
                  },
-                 [] (EdgeData& data) -> std::string {
+                 [] (Edge& edge) -> std::string {
                      char line[64];
-                     sprintf(line, " %2i/%-2i ", data.flow, data.max_flow);
+                     sprintf(line, "%s->%s %2i/%-2i", edge.from->data.name.data(), edge.connected->data.name.data(), edge.data.flow, edge.data.max_flow);
                      return line;
                  });
 }
