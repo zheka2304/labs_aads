@@ -8,10 +8,6 @@ void await_user() {
 }
 
 int main() {
-    Canvas canvas(50, 30);
-    canvas.line(0, 0, 1, 0.5);
-    canvas.print();
-
     FlowNetwork network;
     network.read("../../coursework/data.txt");
 
