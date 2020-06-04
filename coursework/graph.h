@@ -153,6 +153,7 @@ public:
 
     void clear() {
         vertices.clear();
+        matrix.clear();
     }
 
     void print(int arrow_length, std::function<std::string(Vertex&)> vertex_to_string, std::function<std::string(Edge&)> edge_to_string) {

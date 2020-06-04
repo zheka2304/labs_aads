@@ -61,7 +61,7 @@ TEST (graph, build_test) {
     ASSERT_EQ(&v1, graph.get_vertex("A"));
     ASSERT_EQ(&v2, graph.get_vertex("B"));
     graph.connect(v1, v2, "Edge");
-    ASSERT_EQ(graph.get_edge(v1, v2)->data, "Edge");
+    ASSERT_EQ(graph.get_edge(v1, v2).data, "Edge");
     graph.clear();
     ASSERT_EQ(graph.size(), 0);
 }
@@ -72,7 +72,6 @@ TEST (graph, iteration_test) {
         Graph<int, int>::Vertex& v1 = graph.add_vertex(i);
         for (int j = 0; j < i; j++) {
             auto v2 = graph.get_vertex(j);
-            ASSERT_NE(v2, nullptr);
             graph.connect(*v2, v1, i * j);
         }
     }
@@ -83,9 +82,6 @@ TEST (graph, iteration_test) {
         ASSERT_EQ(edge.data, edge.from->data * edge.connected->data);
     });
 
-//    graph.print(7,
-//            [] (int& i) -> std::string {return std::to_string(i);},
-//            [] (int& i) -> std::string {return std::to_string(i);});
 }
 
 
@@ -101,11 +97,11 @@ TEST(flow_network, build) {
     ASSERT_NE(v2, nullptr);
     ASSERT_EQ(v1, network.source);
     ASSERT_EQ(v2, network.target);
-    FlowNetwork::Edge* edge1 = network.mGraph.get_edge(*v1, *v2);;
-    FlowNetwork::Edge* edge2 = network.mGraph.get_edge(*v2, *v1);
-    ASSERT_NE(edge1, nullptr);
-    ASSERT_EQ(edge2, nullptr);
-    ASSERT_EQ(edge1->data.max_flow, 10);
+    FlowNetwork::Edge& edge1 = network.mGraph.get_edge(*v1, *v2);;
+    FlowNetwork::Edge& edge2 = network.mGraph.get_edge(*v2, *v1);
+    ASSERT_EQ(edge1.active, true);
+    ASSERT_EQ(edge2.active, false);
+    ASSERT_EQ(edge1.data.max_flow, 10);
 }
 
 TEST(flow_network, validate_ok) {
@@ -156,9 +152,9 @@ TEST(flow_network, bfs_success) {
     ASSERT_TRUE(network.add_edge_from_string("C T 1"));
     ASSERT_EQ(network.bfs().length(), 4);
 
-    FlowNetwork::Edge* edge = network.mGraph.get_edge(*network.mGraph.get_vertex("B"), *network.mGraph.get_vertex("T"));
-    ASSERT_NE(edge, nullptr);
-    edge->data.flow = edge->data.max_flow;
+    FlowNetwork::Edge& edge = network.mGraph.get_edge(*network.mGraph.get_vertex("B"), *network.mGraph.get_vertex("T"));
+    ASSERT_EQ(edge.active, true);
+    edge.data.flow = edge.data.max_flow;
     ASSERT_EQ(network.bfs().length(), 5);
 }
 
@@ -187,6 +183,7 @@ TEST(flow_network, max_flow_build) {
     });
 }
 
+
 TEST(flow_network, save_and_read) {
     FlowNetwork network;
     ASSERT_TRUE(network.add_edge_from_string("S A 1"));
@@ -196,6 +193,7 @@ TEST(flow_network, save_and_read) {
 
     std::string filename = "unit_test.tmp";
     if (network.save(filename)) {
+        network.clear();
         ASSERT_TRUE(network.read(filename));
         ASSERT_EQ(network.validate(), FlowNetwork::RESULT_OK);
         network.build_max_flow();
